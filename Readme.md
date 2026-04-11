@@ -4,12 +4,6 @@ A real-time object detection system built for retail shelf monitoring, using YOL
 
 ---
 
-## Demo
-
-> _Add a GIF or screenshot of the detection output here_
-
----
-
 ## Tech Stack
 
 - **Python** — core language

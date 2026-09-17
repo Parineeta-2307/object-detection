@@ -54,7 +54,7 @@ streamlit run app.py
 
 ## Limitations
 
-This is a prototype. Training used a subset of SKU-110K, and the shelf monitoring logic is based on detected product counts rather than actual inventory data. Performance can also vary with camera angle, occlusion, and hardware.
+Training used a subset of SKU-110K, and the shelf monitoring logic is based on detected product counts rather than actual inventory data. Performance can also vary with camera angle, occlusion, and hardware.
 
 ## Technologies
 

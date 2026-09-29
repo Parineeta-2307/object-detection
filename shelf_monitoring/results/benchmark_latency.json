@@ -1,0 +1,14 @@
+{
+  "cpu": "Intel(R) Core(TM) i3-10110U CPU @ 2.10GHz",
+  "device": "cpu",
+  "torch_threads": 3,
+  "torch": "2.14.0+cpu",
+  "ultralytics": "8.4.165",
+  "imgsz": 640,
+  "source": "E:\\Coding\\major_projects\\object-detection\\.venv\\Lib\\site-packages\\ultralytics\\assets\\bus.jpg",
+  "runs": 50,
+  "mean_ms": 133.3,
+  "p95_ms": 166.8,
+  "fps": 7.5,
+  "mean_detections_per_image": 0.0
+}

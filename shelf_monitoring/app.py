@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import tempfile
 import os
+import torch
 from ultralytics import YOLO
 
 # =========================================================
@@ -11,6 +12,10 @@ from ultralytics import YOLO
 # =========================================================
 
 MODEL_PATH = "models/best.pt"
+
+# The model sits on CPU until its first predict(), so model.device is not a
+# reliable GPU check; ask torch directly.
+DEVICE = 0 if torch.cuda.is_available() else "cpu"
 
 st.set_page_config(
     page_title="Real-Time Shelf Monitoring",
@@ -96,7 +101,7 @@ if input_mode == "Image":
             source=image,
             imgsz=640,
             conf=confidence,
-            device=0 if model.device.type == "cuda" else "cpu",
+            device=DEVICE,
             verbose=False
         )
 
@@ -284,7 +289,7 @@ else:
                         source=frame,
                         imgsz=640,
                         conf=confidence,
-                        device=0 if model.device.type == "cuda" else "cpu",
+                        device=DEVICE,
                         verbose=False
                     )
 

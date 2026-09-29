@@ -35,6 +35,52 @@ def load_model():
 model = load_model()
 
 # =========================================================
+# VIDEO WRITER
+# =========================================================
+
+def _readable(path):
+    """True if OpenCV can open the file and decode its first frame."""
+    cap = cv2.VideoCapture(path)
+    try:
+        return cap.isOpened() and cap.read()[0]
+    finally:
+        cap.release()
+
+
+def _codec_works(codec, size):
+    """Write one blank frame with this fourcc and check the file reads back."""
+    probe = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4").name
+    try:
+        writer = cv2.VideoWriter(
+            probe, cv2.VideoWriter_fourcc(*codec), 10, size
+        )
+        if not writer.isOpened():
+            return False
+        writer.write(np.zeros((size[1], size[0], 3), np.uint8))
+        writer.release()
+        return _readable(probe)
+    finally:
+        os.unlink(probe)
+
+
+def make_writer(path, fps, size):
+    """
+    Returns (writer, codec). Prefers H.264 ('avc1'), which browsers can
+    play through st.video; falls back to 'mp4v' if avc1 is unavailable
+    in this OpenCV build.
+    """
+    for codec in ("avc1", "mp4v"):
+        if _codec_works(codec, size):
+            writer = cv2.VideoWriter(
+                path, cv2.VideoWriter_fourcc(*codec), fps, size
+            )
+            if writer.isOpened():
+                return writer, codec
+            writer.release()
+    return None, None
+
+
+# =========================================================
 # HEADER
 # =========================================================
 
@@ -262,16 +308,22 @@ else:
                     suffix=".mp4"
                 ).name
 
-                fourcc = cv2.VideoWriter_fourcc(
-                    *"mp4v"
-                )
-
-                writer = cv2.VideoWriter(
+                writer, codec = make_writer(
                     output_path,
-                    fourcc,
                     fps if fps > 0 else 20,
                     (width, height)
                 )
+
+                if writer is None:
+                    st.error("No usable video codec found in this OpenCV build.")
+                    st.stop()
+
+                if codec != "avc1":
+                    st.warning(
+                        "H.264 (avc1) is not available in this OpenCV build, "
+                        "so the output was written as mp4v. Browsers may not "
+                        "be able to play it; use the download button below."
+                    )
 
                 progress = st.progress(0)
                 status = st.empty()
@@ -372,7 +424,19 @@ else:
                     f"Processed {frame_number} frames"
                 )
 
-                st.video(output_path)
+                if _readable(output_path):
+                    st.video(output_path)
+                else:
+                    st.error("The processed video could not be re-opened.")
+
+                if codec != "avc1":
+                    with open(output_path, "rb") as f:
+                        st.download_button(
+                            "Download processed video",
+                            f.read(),
+                            file_name="shelf_output.mp4",
+                            mime="video/mp4"
+                        )
 
                 if frame_number > 0:
 

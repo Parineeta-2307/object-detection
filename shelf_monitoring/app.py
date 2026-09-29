@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import tempfile
 import os
+from pathlib import Path
 import torch
 from ultralytics import YOLO
 
@@ -11,7 +12,7 @@ from ultralytics import YOLO
 # CONFIGURATION
 # =========================================================
 
-MODEL_PATH = "models/best.pt"
+MODEL_PATH = Path(__file__).parent / "models" / "best.pt"
 
 # The model sits on CPU until its first predict(), so model.device is not a
 # reliable GPU check; ask torch directly.
@@ -29,7 +30,7 @@ st.set_page_config(
 
 @st.cache_resource
 def load_model():
-    return YOLO(MODEL_PATH)
+    return YOLO(str(MODEL_PATH))
 
 model = load_model()
 
